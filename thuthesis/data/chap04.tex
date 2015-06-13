@@ -1,0 +1,45 @@
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+\chapter{基于AS新型编址下的FIB表的生成与压缩情况评估}
+\label{dctg}
+\section{引言}
+本章将详细介绍当前网络下FIB表的生成过程以及在新型编址方案CABA下采用基于ASN的BGP协议时FIB表的情况，通过对比评估新型编址环境下路由的可扩展性。
+\section{数据集介绍}
+实验的数据集来自Oregon大学的Route Views\onlinecite{bgpdata}工程搜集的BGP数据。进入FTP下载页面，选择13台路由器(路由器的名称为: perth, isc, linux, sydney, wide, eqix, saopaulo, nmax, telxati, jinx, sorx,sg)，获取其2015 年5 月1 日0 点的全局路由表。
+
+\section{当前网络下的FIB表}
+
+\begin{enumerate}
+\item 从Oregon大学的Route Views\onlinecite{bgpdata}下载13台路由器的RIB数据，下载的原始数据是二进制格式，需要工具来解析。
+\item 使用libbgpdump\onlinecite{libbgpdump}解析二进制文件。需要从github上下载libbgpdump 的源代码，先执行configure，然后执行make即可生成bgpdump可执行文件，之后通过$./bgpdump -M -O outputfile inputfile$ 命令获取解析后的文件，使用M参数简化路由表项(如：TABLE\_DUMP\_V2|03/31/15 02:00:00|A|206.126.236.120|41095|0.0.0.0/0|41095 3356|IGP)。
+\item 相同前缀在RIB表中可能有多条路由信息，但不考虑多路由机制，FIB表中存储的是该前缀的最优路由信息。评价最优路径有两个原则：路径的长度要最短，当路径长度相同的时候，选择下一跳自治系统号最小的路由信息。编写函数，将13台路由器的RIB表转换成FIB表。
+\end{enumerate}
+
+\section{基于AS新型编址下FIB表的设计与生成}
+\subsection{关键技术}
+将现有网络中的FIB表转换成基于AS新型编址CABA下的FIB表的主要过程如下所示：
+\begin{enumerate}
+\item 1
+\item 1
+\item 1
+\end{enumerate}
+\subsection{增量部署}
+1
+\subsection{遇到的问题和解决方案}
+1
+\section{FIB表压缩情况的评估}
+1
+\subsection{压缩结果}
+1
+\subsection{结果分析}
+1
+\section{小结}
+1
+
+
+\section{小结}
+1

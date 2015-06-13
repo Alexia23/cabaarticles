@@ -1,0 +1,92 @@
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+\secretlevel{绝密} \secretyear{2100}
+
+\ctitle{基于AS编址的互联网可扩展路由机制的性能评价}
+% 根据自己的情况选，不用这样复杂
+\makeatletter
+\ifthu@bachelor\relax\else
+  \ifthu@doctor
+    \cdegree{工学博士}
+  \else
+    \ifthu@master
+      \cdegree{工学硕士}
+    \fi
+  \fi
+\fi
+\makeatother
+
+
+\cdepartment[计算机]{计算机科学与技术系}
+\cmajor{计算机科学与技术}
+\cauthor{王庆}
+\csupervisor{王之梁副教授}
+% 如果没有副指导老师或者联合指导老师，把下面两行相应的删除即可。
+%\cassosupervisor{施新刚副教授}
+% \ccosupervisor{某某某教授}
+% 日期自动生成，如果你要自己写就改这个cdate
+%\cdate{\CJKdigits{\the\year}年\CJKnumber{\the\month}月}
+
+% 博士后部分
+% \cfirstdiscipline{计算机科学与技术}
+% \cseconddiscipline{系统结构}
+% \postdoctordate{2009年7月——2011年7月}
+
+\etitle{Bandwidth Guarantee for Tenant Networks in Datacenter Clouds}
+% 这块比较复杂，需要分情况讨论：
+% 1. 学术型硕士
+%    \edegree：必须为Master of Arts或Master of Science（注意大小写）
+%              “哲学、文学、历史学、法学、教育学、艺术学门类，公共管理学科
+%               填写Master of Arts，其它填写Master of Science”
+%    \emajor：“获得一级学科授权的学科填写一级学科名称，其它填写二级学科名称”
+% 2. 专业型硕士
+%    \edegree：“填写专业学位英文名称全称”
+%    \emajor：“工程硕士填写工程领域，其它专业学位不填写此项”
+% 3. 学术型博士
+%    \edegree：Doctor of Philosophy（注意大小写）
+%    \emajor：“获得一级学科授权的学科填写一级学科名称，其它填写二级学科名称”
+% 4. 专业型博士
+%    \edegree：“填写专业学位英文名称全称”
+%    \emajor：不填写此项
+\edegree{Master of Science}
+\emajor{Computer Science and Technology}
+\eauthor{Wang Jingyi}
+\esupervisor{Professor Yin Xia}
+%\eassosupervisor{Shi Xingang}
+% 这个日期也会自动生成，你要改么？
+% \edate{December, 2005}
+
+% 定义中英文摘要和关键字
+\begin{cabstract}
+  互联网的不断完善和扩展，网络设备和终端设备数量的不断增加，IPv4地址处于枯竭的状态，从IPv4过渡到IPv6的技术逐渐成熟，IPv6 地址本身的诸多优势，都预示未来IPv6网络将会迅速发展，由此带来的IPv6网络路由的可扩展性、收敛性和安全性问题值得研究。
+
+  本文为了解决IPv6网络带来的可扩展路由问题，提出了基于无类AS编址的CABA(Classless AS Based Addressing)方案，独立于现有网络的IPv6地址分配方案，同时能够兼容现有的IPv6方案，可以实现增量部署。新型的CABA方案，将自治系统号嵌入到IPv6的地址中，在BGP路由的过程中，一个自治系统只需要向外广播一条嵌入自治系统号的前缀，这将极大程度的减少全局路由表的大小，同时也会减少BGP中update包的数目以及路由震荡的频率和收敛时间，尽可能解决IPv6网络带来的可扩展路由问题。
+
+  本文主要进行了以下工作；
+
+  \begin{enumerate}
+  \item 提出了一个新型的基于无类AS的IPv6编址方案。同时为了实现IPv6网络域间路由的扩展性，设计了基于自治系统号的域间路由机制A-BGP(ASN based BGP)。
+  \item 将当前网络中的RIB表转换成FIB，与A-BGP得到的FIB表进行对比，评估CABA和A-BGP下FIB 表的压缩情况，结果显示A-BGP下的FIB 表项是现网络中FIB表的10%。
+  \item 熟悉SIMBGP仿真系统，加载CAIDA上全网的拓扑结构，任选多个自治系统，对比其向外广播嵌入自治系统号的IPv6前缀和广播现在网络中广播出去的所有IPv4 的update包数和收敛时间，结果显示当前网络自治系统号广播出去的prefix越多，采用新型A-BGP机制update数目减少幅度越大。
+  \item 通过Docker软件运行多台装有Quagga软件路由器的虚拟机器，部署小型拓扑结构，在该结构上实现A-BGP机制，通过查看生成的BGP路由表表项数目，评估路由的可扩展程度。
+  \end{enumerate}
+\end{cabstract}
+
+\ckeywords{CABA, A-BGP, 可扩展路由}
+
+\begin{eabstract}
+Waiting for translation.
+
+The main work of this thesis include:
+\begin{enumerate}
+\item Propose a new design.
+\item Do things to evaluate FIB.
+\item SimBGP.
+\item Docker run Quagga
+\end{enumerate}
+\end{eabstract}
+
+\ekeywords{CABA, A-BGP, Scalable Routing}

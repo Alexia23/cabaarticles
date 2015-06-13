@@ -1,0 +1,153 @@
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
+
+\chapter{相关研究综述}
+\label{cha:review}
+
+\section{引言}
+本章对域间路由协议、可扩展路由机制的研究现状、现有的IP网络编址方案进行了综述，首先介绍域间路由的基础知识，然后介绍目前解决路由可扩展性的方法和缺陷，以及现有的IPv4标准编址方案、IPv6 标准编址方案、IPv6新型编址方案。
+
+\section{域间路由协议}
+\subsection{BGP协议}
+BGP(Border Gateway Protocol)是在自治系统之间使用的外部网关路由协议。其在路由的过程中，需要考虑更多的政治、安全、经济因素，不同于内部网关协议，只需要将分组从源地址发送到目的地址。
+
+我们可以将网络结构简化为自治系统间的拓扑图。根据BGP协议对中转流量的作用，我们可以将网络大致分为三类：
+
+\begin{itemize}
+\item 与BGP图只有一个连接的网络，中转流量不会经过这些网络，因为没有中转接收方，称之为末端网络（stub network）。
+\item 与BGP图有超过一个连接的网络，除非该网络限制中转，否则流量会经过这些网络进行中转，称之为多连接网络（multiconnected network）。
+\item 满足部分限制条件(比如交钱)之后，愿意处理第三方分组，称之为穿越网络（transit network）。
+\end{itemize}
+
+BGP路由器之间是通过建立TCP连接，使用TCP端口179进行通信的，可靠又能隐藏数据包在中转过程中其他自治系统的信息。BGP是距离矢量协议，每一台路由器需要维护它到目标的开销以及路径，能够轻易检测是否发生路由环路。每台路由器向外宣布自己的BGP最优路由信息，当一台路由器收到邻居的路径信息时，会与路由表中的路由信息进行对比，如果收到的路由信息比路由表中对应的路由信息更优，则更新路由表，否则丢弃路径信息包。所以，每台路由器都有一个路由评价最优函数，根据路径的长度、是否该路径满足该BGP 特有的限制等多方面的条件进行择优。
+
+BGP邻居协商的过程中，使用四种类型的报文：
+
+\begin{itemize}
+\item OPEN:建立连接、协商参数。
+\item KEEPALIVE：周期发送，维护检查和Peer之间的连接。
+\item UPDATE：交换网络可达路由信息。
+\item NOTIFICATION：报告网络中发生的各类错误和特殊指令，发生错误TCP连接断开。
+\end{itemize}
+
+BGP邻居协商过程中有5种状态：
+
+\begin{itemize}
+\item Idle：BGP接收到启动事件的指令，初始化资源，转到Active状态。
+\item Active：和邻居建立TCP连接，本地路由器发OPEN包给邻居。如果接收到结束事件的指令，释放资源，转到Idle 状态。
+\item OpenSent： BGP收到OPEN包，检查数据是否正确。如果监测BGP帧头不正确返回到Active 状态。如果OPEN帧的内容错误，发送NOTIFICATION 包，关闭TCP连接，返回到Idle状态。如果没有错误，发送OPEN CONFIRM消息，进入OpenConfirm状态。
+\item OpenConfirm： 收到OPEN CONFIRM消息，进入Established状态，如果长时间没有收到OPEN CONFIRM消息，返回到Idle状态。
+\item Established：在该状态，路由器可以和自己的邻居之间发送UPDATE，KEEPALIVE，NOTIFICATION信息。如果收到断开连接的消息或者超过保持时间，返回到Idle状态。
+\end{itemize}
+
+
+
+\subsection{BGP-4协议}
+BGP协议主要是为了在网络中交换网络可达信息（AS路径）。因为AS路径信息的存在，使得在路由的过程中，可以比较简单的检测出路由环路，同时使得一些路由策略能够被强制执行。
+
+BGP-4是BGP的扩展，BGP-4提出一个新的支持无类域间路由的机制。在该机制中支持宣告IP前缀，去除了地址类的概念。同时，该机制允许路由聚合和AS路径的聚合。BGP-4采用路径向量算法，综合了距离向量算法和链路状态算法。BGP-4邻居协商时，使用四种类型的报文，报文的格式和BGP略有不同。在UPDATE 包中，宣布的前缀填写在NLRI(Network Layer Reachability Information) 部分，AS路径填写在Path Attribute部分。
+
+BGP-4中有3个路由信息库：
+\begin{itemize}
+\item Adj-RIBs-In: 存储从收到UPDATE包学到的路由信息。
+\item Loc-RIB: 应用本地路由策略从Adj-RIBs-In中的路由信息中选出本地路由信息。
+\item Adj-RIBs-Out: 存储从peer学习到的最优路径信息，用于宣告。
+\end{itemize}
+
+BGP-4邻居协商过程中有6种状态，比BGP多一种Connect状态，根据RFC1771\cite{RFCBGP4}文档画出BGP-4 状态机：
+
+\subsection{BGP4+协议}
+BGP4+\cite{RFCBGP4plus}定义了两种BGP属性格式(MP\_REACH\_NLRI和MP\_UNREACH\_NLRI)，用于宣告或者撤销IPv6 路由可达信息的广播。
+
+IPv6和IPv4之间的区别在于IPv6存在范围内的单播地址，特定环境中需要使用特定的地址范围。
+
+IPv6定义了3种单播地址范围：
+
+\begin{itemize}
+\item global：下一跳属性也需要包含global范围地址。
+\item site-local：属于non-link-local，仅仅在一个区域范围内有效
+\item link-local：生成ICMP重定向包或者作为下一跳地址的时候，使用link-local。对于所有的直连路由，IPv6 路由器必须有一个link-local下一跳地址，而且该路由器和下一跳路由有相同的子网前缀。
+\end{itemize}
+
+综上，BGP4+在传播IPv6路由可达信息的过程中，如果BGP宣告路由器和下一跳IPv6地址在一个子网，那么UPDATE包里的下一跳属性应包括global 地址和link-local 地址，因为同一个子网内的通信需要依赖link-local地址，即在MP\_REACH\_NLRI属性中的Next Hop Field的网络地址先写16bytes的link-local 地址，再写16bytes的global地址。
+
+\section{可扩展路由机制研究现状}
+全球路由表的快速膨胀，使得互联网域间路由的可扩展性成为急需解决的问题，很多学者进行深入研究，提出了不改变现有路由方法的机制和新型可扩展路由机制。
+\subsection{不改变现有路由方法的机制}
+不改变现有路由方法的机制目前有两大类，ID/Locator分离机制和局部FIB压缩机制。
+\subsubsection{ID/Locator分离机制}
+根据分离机制的不同，可以将其分为三种\cite{Identificationroute}：
+\begin{itemize}
+\item 基于网络的ID/Locator分离机制，也就是核心网络和边缘网络的分离方案。将网络划分两个部分：边缘网络采用PI地址，用其作为主机标识符和内部的路由寻址；核心网络采用PA地址空间。核心网络和边缘网络之间的转换通过映射来达到。
+\item 基于主机的ID/Locator分离机制,在主机协议栈上面加上表示层，完成ID/Locator之间的映射，主机标识应用的使用者，网络地址标识网络位置，用来转发数据，所以应用连接不用和IP地址绑定，只需要绑定主机标识。
+\item 基于主机和网络的ID/Locator分离机制，边缘网络可以使用写入报文头的目的地址，也可以根据服务提供商的需求重写目的地址，更改后续报文。
+\end{itemize}
+\subsubsection{FIB聚合压缩技术}
+FIB聚合压缩技术通过在少数核心路由器中构建多个虚拟前缀，将这些虚拟前缀只宣布给没有构建虚拟前缀的非核心路由器，在FIB表中有相同下一跳的路由前缀会被聚合，从而减少非核心路由器的规模。
+\subsection{新型可扩展路由机制}
+目前技术比较成熟有层次化路由、地理路由、紧凑路由等。
+\begin{itemize}
+\item 层次化路由指的是基于网络层次结构的路由，不同的层次使用不同的路由算法。传统的层次化路由在不同的层级采用相同的IP前缀，限制了层次结构的可扩展性。鉴于此，有学者提出了基于AS的解决方案HLP(Hybrid Link-state And Path-Vector Procotol)方案\cite{HLP},在自治系统之间采用基于自治系统的路径向量算法，在自治系统内采用链路状态协议，通过层次结构自治系统间的路径向量算法可以隐藏自治系统内的路由更新信息，增加了路由可扩展性。
+\item 地理路由是指利用地理信息来帮助编址和路由，目前有三大类：纯地理信息路由方案、基于地理信息的覆盖网络和ISP信息辅助的基于地理信息的路由机制。纯地理路由的典型代表是根据经纬度对IP地址进行编址。基于地理信息的覆盖网络核心是在网络上在部署一个有地理位置信息的网络，可以增量部署，但不仅没有解决路由的可扩展性，而且使得全局路由表更大。ISP信息辅助的基于地理信息的路由机制典型代表是GIRO(Geographically Informed Inter-Domain Routing)，在IP地址中用AS号表示ISP信息，可以通过IP地址，了解AS号和ISP。
+\item 紧凑路由\cite{CompactRouting}是一些学者从图论算法的角度提出来解决路由可扩展的问题。
+\end{itemize}
+
+\section{现有IP网络编址方案}
+目前IP网络的编址方案主要分为三大类：IPv4标准编址方案，IPv6标准编址方案，IP6新型编址方案。
+
+\subsection{IPv4标准编址方案}
+IPv4地址从无类编址转化为有类编址。因为B类消耗快，C类增长快，导致路由表的规模增长。于是提出了通过分配连续的C类地址块，这样它们在路由表中可以被聚合，从而缓解路由表增长的速度。但是这中方法有局限性，当组织结构是多宿主时，前缀会通过所有运营商宣告，导致前缀不能被聚合，降低效率。另外，如果一个组织结构改变运营商又没有进行重新编址，这样原来的前缀不能被新的运营商聚合。
+
+\subsection{IPv6标准编址方案}
+目前IPv6标准编址方案主要有三大类：基于地域，基于运营商的、基于GSE(Global, Site, and End-system address elements)的编址方案。
+\begin{itemize}
+\item 基于地域：国家标识、城市标识、站点标识、站点内部标识，它的优点是可扩展性好，基于地域编址的路由信息聚合；如果本地改变运营商，不需要重编号。缺点是对拓扑要求高，同一地址运营商之间需要相互连接；而且不支持灵活的路由策略。
+\item 基于运营商的编址结构：（ipv6分布式地址分配）注册机构ID，运营商ID，订阅者ID，订阅者内部ID。目前的注册机构有IANA、APNIC、CNNIC。注册机构ID是分配地址的注册机构的标识，运行商和订阅者ID根据策略决定。
+\item GSE层次化编址,编址包含可路由前缀（位置标识）、站点内子网标识、端系统标识（全球唯一的身份标识）三大部分。该编址方案提出了ID/Locator分离的思想，端系统是身份标识，可路由前缀是位置标识，解决了边缘网络的多宿主问题，因为有身份标识，可以定位到多宿主。具体的编址方案是把IPv6 分成6个区域：FP：001 ipv6 的地址前缀；TLA ID：len=13，核心路由器对活跃的TLA ID有一条路由；RES： 8位保留位， TLA、NLA变大后使用；NLA ID：24位，每个TLA有24 位NLA空间；SLA ID：len=16，一个组织内的子网（层次/平面）；Interface ID：64位（TLA是平面结构，则TLA最多8192个，为了限制DFZ(default-free zone)路由表长度）。
+\end{itemize}
+
+\subsection{IPv6新型编址方案}
+因为IPv6地址目前还没有广泛使用，很多学者仔细研究了新型的编址方案，主要有三大类：
+\begin{itemize}
+\item 本地地址编址方案\cite{localaddress}，仅用于区域内部，将地址分为unique prefix ，global id， local id， interface id四个部分，global和local 随机分配id，不支持全球路由。
+\item 嵌入地理位置的编址方案，比如可以嵌入经纬度，一个前缀对应的是一个位置， 那么/64是比/48更大的地址块。
+\item 嵌入ASN的编制方案，目前比较经典的方案有两种：
+    \begin{itemize}
+    \item M.Levy提出\cite{asnipaddr}一种根据自治系统号分配/48的IPv6地址，具体对IPv6128 位地址的划分如下表\ref{tab:asnaddr} 所示：
+    \begin{table}[h]
+    \centering
+    \caption{基于ASN的地址分配方案}
+    \label{tab:asnaddr}
+        \begin{tabular}{|c|c|c|}
+        \hline
+        IANA$/$16 & 32 bit ASN & 80 bits for IPv6$/$48 space\\
+        \hline
+        \end{tabular}
+    \end{table}
+    IANA分配a$/$16，比如现在使用的从IPv6转换为IPv4的地址段2001::$/$16。因为ASN是由RIR分配的32bits数字，所以在地址段分配32位。剩余的80bits 分配给用户定义的ID。该方案支持多宿主，但IANA分配的16位前缀所占位数过多，而且因为目前IPv6并没有广泛使用，所以这部分完全不可不要，浪费了16位的地址。剩余的80 位用作身份标识较多，因为mac地址目前有48位已足够使用，身份标识建议64位，那么总共有32位的地址仍可继续利用。这样的地址分配没有考虑到层次化的地址分配，所以平面式的结构，不容易聚合。
+    \item J.Li等学者为了解决域间路由提出\cite{lima}一种新型的寻址和路由结构LIMA(Less-Is-More Architecture)，其不同于身份位置分离的策略，而是通过使用与位置无关的名称和与位置有关的地址进行路由。该方案中要求边缘网络必须是PA地址，而且边缘网络的路由信息不能扩散到全局路由表中，通过结合网络层次化的结构，减少全局路由表的大小和变动。LIMA需要依赖于一种新型的IPv6编址方案，具体如下\ref{tab:limaasnaddr}：
+    \begin{table}[h]
+    \centering
+    \caption{LIMA：基于ASN的地址分配方案}
+    \label{tab:limaasnaddr}
+        \begin{tabular}{|c|c|c|}
+        \hline
+        Provider ASN-32 & Stub ASN-32 & Stub-local IDA-64\\
+        \hline
+        \end{tabular}
+    \end{table}
+    该地址分配方案充分利用层次化来寻址，前48位属于位置标识，后64位属于身份标识地址。在一级路由表中只需要维护服务提供商自治系统的路由信息，没有任何关于边界自治系统的路由信息，在服务提供商的边界路由器中的分离数据表中维护服务商AS号和对应的一些边界AS号信息，这样可以极大程度地减少全局路由表的大小，相当于把全局路由表的主干留下，枝干放到主干网络的路由器中，但当边界自治系统改变服务商时需要重新划分地址，还有多宿主，移动性和流量工程等方面的问题。总之，网络层级划分太多且不合理。
+    \end{itemize}
+    
+\end{itemize}
+
+目前IPv6的地址分配和IPv4的相同，RIR(区域互联网注册管理机构)根据个人请求的空间需求分配IPv6地址块。因为IPv6网络目前处于萌芽的状态，目前IPv6的很多编址方案都存在很大的局限性，本文鉴于此，提出了一种新型的可增量部署的方案。
+
+\section{小结}
+本章对域间路由协议BGP、BGP-4、BGP+做了简单的介绍，了解其在通信发包的细节，为之后的实验打下基础。
+其次，介绍了可扩展路由机制的研究现状、了解目前解决可扩展路由问题的大体思路主要有两种身份位置分离和层次路由，给我的研究提供了思路。
+最后，对现有的IP网络编址方案进行了归纳总结，了解现有编址方案的优缺点，从而对本文设计的新型IPv6编址方案进行更全面的评价和思考。
+
