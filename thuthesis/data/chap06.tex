@@ -1,4 +1,4 @@
-
+﻿
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
@@ -6,9 +6,13 @@
 
 \chapter{基于AS编址的互联网可扩展路由机制的软件路由器实现与测试}
 \section{引言}
+
 本章节主要通过软件路由器对基于AS编址的互联网可扩展路由机制进行实现和测试，通过观察搭建网络中，BGP路由表项的大小，判断CABA编址对路由可扩展性的作用。
+
 \section{基于AS编址的互联网可扩展路由机制的实现方案}
+
 基于AS编址的互联网可扩展路由机制的实现方案主要分三步：
+
 \begin{enumerate}
 \item 选择拓扑结构。该章节的实验选择现今网络Tier1层级\cite{tier1}的拓扑结构。Tier1的ASNs 见表\ref{tab:tier1asn}，Tier1自治系统关系来源于CAIDA官网上20150501数据\onlinecite{caidaasdata}，比表\ref{tab:tier1asn}显示的20150201时刻的tier1层级的自治系统增加了ASN为4436的自治系统。
 \item 生成配置文件。在充分了解Quagga软件路由器的配置之后，完成代码批量生成配置文件。每一个自治系统仅有一台路由器，需要定义该路由器的自治系统号，touter-id，邻居的IPv6地址和邻居的自治系统号，向外宣告嵌有自治系统号的IPv6前缀。以自治系统174为例，该自治系统有一台路由器，该路由器的配置文件如下：\\
@@ -59,7 +63,9 @@
 \end{enumerate}
 
 \section{试验环境}
+
 \subsection{Quagga软件路由器的核心思想和工作原理}
+
 
 \begin{figure}
   \centering
@@ -71,10 +77,12 @@
 Quagga\cite{quagga}软件路由器的前身是zebra，支持IPv6，不同网络协议运行不同的进程，相互独立。zebra为核心进程，管理全局路由表。网络协议进程通过vtysh进程和内核路由信息表进行交互。
 
 \subsection{Docker系统的核心思想和工作原理}
+
 Docker\cite{docker}是通过Linux容器、直接复用本地主机的操作系统等技术实现了超轻量级的操作系统虚拟化，可以实现在一台机器上运行几千台Docker容器。在Docker中，开发人员使用镜像来构建开发容器，通过将一台配置好环境的Docker容器保存成镜像进行复用，可以快速高效的部署实验中网络环境的软件路由器。Docker中容器除了运行其中应用外，不消耗额外资源，启动时间以秒计，大量节约了开发环境的部署、实际环境的测试等时间。Docker中有三个基本概念：镜像、容器和仓库，镜像是操作系统的安装包，仓库来管理存储所有的镜像，在容器中运行镜像就实现了操作系统的功能。
 
 \section{实验流程}
 基于AS编址的互联网可扩展路由机制的软件路由器实现与测试的实验流程如下：
+
 \begin{enumerate}
 \item 确定拓扑结构：有N台路由器，每台路由器代表一个自治域。
 \item 配置运行环境：安装docker软件，创建N台容器，每台容器中安装Ubuntu14.04系统，安装Quagga。
@@ -82,23 +90,34 @@ Docker\cite{docker}是通过Linux容器、直接复用本地主机的操作系�
 \item 生成Quagga配置文件：确定每台路由器对应的ASN，router-id，neighbor-info，network-prefix。
 \item 运行Quagga中的zebra和bgpd进程，统计ipv6 bgp route的数目。
 \end{enumerate}
-目前实验的拓扑结构为18台路由器，18台路由器之间的peer-link连接共有149条，如果18台路由器全连接有153条，该拓扑结构中除自治系统(701,12956)，(2914,12956)，(3257,12956)，(4436,12956)这四对自治系统未连接，其余自治系统两两连接构成Tier的拓扑图。
+
 通过编写程序生成脚本来创建容器，启动容器，创建网桥，配置接口，生成Quagga路由器BGP配置文件，启动Quagga 中的进程。
+
+\section{实验拓扑}
+\label{sect:topology}
+本小节实验的拓扑结构为18台路由器，18台路由器之间的peer-link连接共有149条，如果18台路由器全连接有153条，该拓扑结构中除自治系统$(701,12956),(2914,12956),(3257,12956),(4436,12956)$这四对自治系统未连接，其余自治系统两两连接构成Tier1的拓扑图。
 \section{实验对比设计}
+
 单纯观察部署CABA地址方案的互联网拓扑结构生成的BGP路由表项数目，并不能说明问题。所以本章节设计了对比实验，来观察BGP路由项数目的变化趋势和变化程度。对比实验设计如下：
+
 \begin{enumerate}
 \item 给路由器配置基于AS的新型IPv6地址，向外宣布嵌入ASN的IPv6前缀。
 \item 给路由器配置IPv4地址，向外宣布CAIDA官网统计出来ASN对应的所有IPv4前缀。
 \end{enumerate}
-\section{实验分析}
-%\begin{figure}
-%  \centering
-%  % Requires \usepackage{graphicx}
-%  \includegraphics[width=\textwidth]{2}\\
-%  \caption{软件路由器：基于CABA编址的BGP路由表表项数据}\label{fig:temp}
-%\end{figure}
 
-目前该实验基于Tier1层级的自治系统之间构成的拓扑结构，完成了给路由器配置基于AS的新型IPv6地址，向外宣布嵌入ASN的IPv6前缀的部分。：
+\section{实验分析}
+在Docker中部署本章第\ref{sect:topology}小节拓扑的网络环境，不同路由器属于不同自治系统，每个自治系统向外公布嵌有自治系统号的路由，最后18台路由器得到BGP路由表，自治系统174 内的路由器的BGP路由表见图\ref{fig:174res},因为该拓扑结构中有18台路由器，每台路由器向外公布一条前缀，自治系统174内的路由器的BGP表项有17条，我查看其他路由器均为17条路由。
+
+由于在自治系统向外宣告IPv4前缀的对比实验中，因为不能确定自治系统内的路由器向外宣告IPv4路由的IPv4网络接口，所以不能进行此对比实验。
+
+\begin{figure}
+  \centering
+  % Requires \usepackage{graphicx}
+  \includegraphics[width=\textwidth]{174res}\\
+  \caption{自治系统174内路由器的BGP路由表表项数据}\label{fig:174res}
+\end{figure}
 
 \section{小结}
+
+本章实现了软件路由器层面的基于AS的A-BGP路由机制，最终软件路由器的BGP路由表项为该拓扑结构自治系统个数减1。
 我们大胆合理推测，基于CABA编址BGP路由表项的数目将会远小于现有对应的BGP路由表项，因为基于CABA编址的BGP路由表项只需要向外宣布一条前缀，而现有网络对于一个自治系统，可能向外宣布多条前缀，最多可达4000多条，参考图\ref{fig:7}。
