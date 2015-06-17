@@ -16,6 +16,7 @@
 \usepackage{thutils}
 \usepackage{listings}
 \usepackage{pdfpages}
+\usepackage{graphicx}
 
 % 你可以在这里修改配置文件中的定义，导言区可以使用中文。
 % \def\myname{薛瑞尼}
@@ -52,6 +53,7 @@
 \include{data/chap04}
 \include{data/chap05}
 \include{data/chap06}
+\include{data/chap07}
 
 
 %%% 其它部分
@@ -69,8 +71,8 @@
 \fi
 \makeatother
 
-p
-% 参考文献
+
+% 参考文献p
 % 注意至少需要引用一篇参考文献，否则下面两行可能引起编译错误。
 % 如果不需要参考文献，请将下面两行删除或注释掉。
 \bibliographystyle{thubib}
@@ -86,5 +88,5 @@ p
 \end{appendix}
 
 % 个人简历
-\include{data/resume}
+%\include{data/resume}
 \end{document}

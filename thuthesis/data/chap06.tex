@@ -10,8 +10,8 @@
 \section{基于AS编址的互联网可扩展路由机制的实现方案}
 基于AS编址的互联网可扩展路由机制的实现方案主要分三步：
 \begin{enumerate}
-\item 选择拓扑结构。该章节的实验选择现今网络Tier1层级\cite{tier1}的拓扑结构。Tier1的ASNs 见表\ref{tab:tier1asn}，Tier1自治系统关系来源于CAIDA官网上20150201数据\onlinecite{caidaasdata}。
-\item 生成配置文件。在充分了解Quagga软件路由器的配置之后，完成代码批量生成配置文件。每一个自治系统仅有一台路由器，需要定义该路由器的自治系统号，touter-id，邻居的IPv6地址和邻居的自治系统号，向外宣告嵌有自治系统号的IPv6前缀。以路由器174为例的配置文件如下：\\
+\item 选择拓扑结构。该章节的实验选择现今网络Tier1层级\cite{tier1}的拓扑结构。Tier1的ASNs 见表\ref{tab:tier1asn}，Tier1自治系统关系来源于CAIDA官网上20150501数据\onlinecite{caidaasdata}，比表\ref{tab:tier1asn}显示的20150201时刻的tier1层级的自治系统增加了ASN为4436的自治系统。
+\item 生成配置文件。在充分了解Quagga软件路由器的配置之后，完成代码批量生成配置文件。每一个自治系统仅有一台路由器，需要定义该路由器的自治系统号，touter-id，邻居的IPv6地址和邻居的自治系统号，向外宣告嵌有自治系统号的IPv6前缀。以自治系统174为例，该自治系统有一台路由器，该路由器的配置文件如下：\\
     hostname bgpd\\
     password zebra\\
     log stdout\\
@@ -70,7 +70,7 @@
 
 Quagga\cite{quagga}软件路由器的前身是zebra，支持IPv6，不同网络协议运行不同的进程，相互独立。zebra为核心进程，管理全局路由表。网络协议进程通过vtysh进程和内核路由信息表进行交互。
 
-\subsection{docker系统的核心思想和工作原理}
+\subsection{Docker系统的核心思想和工作原理}
 Docker\cite{docker}是通过Linux容器、直接复用本地主机的操作系统等技术实现了超轻量级的操作系统虚拟化，可以实现在一台机器上运行几千台Docker容器。在Docker中，开发人员使用镜像来构建开发容器，通过将一台配置好环境的Docker容器保存成镜像进行复用，可以快速高效的部署实验中网络环境的软件路由器。Docker中容器除了运行其中应用外，不消耗额外资源，启动时间以秒计，大量节约了开发环境的部署、实际环境的测试等时间。Docker中有三个基本概念：镜像、容器和仓库，镜像是操作系统的安装包，仓库来管理存储所有的镜像，在容器中运行镜像就实现了操作系统的功能。
 
 \section{实验流程}
@@ -82,7 +82,8 @@ Docker\cite{docker}是通过Linux容器、直接复用本地主机的操作系�
 \item 生成Quagga配置文件：确定每台路由器对应的ASN，router-id，neighbor-info，network-prefix。
 \item 运行Quagga中的zebra和bgpd进程，统计ipv6 bgp route的数目。
 \end{enumerate}
-目前实验的拓扑结构为17台路由器，17台路由器之间的peer-link连接共有149条，需要编写程序生成脚本来创建容器，启动容器，创建网桥，配置接口，启动Quagga中的进程。其中通过编写程序生成Quagga路由器BGP配置文件。
+目前实验的拓扑结构为18台路由器，18台路由器之间的peer-link连接共有149条，如果18台路由器全连接有153条，该拓扑结构中除自治系统(701,12956)，(2914,12956)，(3257,12956)，(4436,12956)这四对自治系统未连接，其余自治系统两两连接构成Tier的拓扑图。
+通过编写程序生成脚本来创建容器，启动容器，创建网桥，配置接口，生成Quagga路由器BGP配置文件，启动Quagga 中的进程。
 \section{实验对比设计}
 单纯观察部署CABA地址方案的互联网拓扑结构生成的BGP路由表项数目，并不能说明问题。所以本章节设计了对比实验，来观察BGP路由项数目的变化趋势和变化程度。对比实验设计如下：
 \begin{enumerate}

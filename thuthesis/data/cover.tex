@@ -3,9 +3,9 @@
 %%% mode: latex
 %%% TeX-master: t
 %%% End:
-\secretlevel{绝密} \secretyear{2100}
+\secretlevel{公开} \secretyear{2100}
 
-\ctitle{基于AS编址的互联网可扩展路由机制的性能评价}
+\ctitle{基于AS编址的互联网可扩展路由机制的仿真评价与测试}
 % 根据自己的情况选，不用这样复杂
 \makeatletter
 \ifthu@bachelor\relax\else
@@ -23,7 +23,7 @@
 \cdepartment[计算机]{计算机科学与技术系}
 \cmajor{计算机科学与技术}
 \cauthor{王庆}
-\csupervisor{王之梁副教授}
+\csupervisor{王之梁副研究员}
 % 如果没有副指导老师或者联合指导老师，把下面两行相应的删除即可。
 %\cassosupervisor{施新刚副教授}
 % \ccosupervisor{某某某教授}
@@ -63,35 +63,35 @@
 \begin{cabstract}
   互联网的不断完善和扩展，网络设备和终端设备数量的不断增加，IPv4地址处于枯竭的状态，从IPv4过渡到IPv6的技术逐渐成熟，IPv6 地址本身的诸多优势，都预示未来IPv6网络将会迅速发展，由此带来的IPv6网络路由的可扩展性、收敛性和安全性问题值得研究。
 
-  本文为了解决IPv6网络带来的可扩展路由问题，提出了基于无类AS编址的CABA(Classless AS Based Addressing)方案，独立于现有网络的IPv6地址分配方案，同时能够兼容现有的IPv6方案，可以实现增量部署。新型的CABA方案，将自治系统号嵌入到IPv6的地址中，在BGP路由的过程中，一个自治系统只需要向外广播一条嵌入自治系统号的前缀，这将极大程度的减少全局路由表的大小，同时也会减少BGP中update 包的数目以及路由震荡的频率和收敛时间，尽可能解决IPv6网络带来的可扩展路由问题。
+  本文为了解决IPv6网络带来的可扩展路由问题，对已有的基于无类AS编址的CABA(Classless AS Based Addressing)方案以及基于自治系统号的域间路由机制A-BGP(ASN based BGP) 进行仿真评价与测试，验证其对路由可扩展性的作用。该CABA编址方案将自治系统号嵌入到IPv6 的地址中，兼容现有的IPv6 方案，可以实现增量部署。该A-BGP近需向外宣告一条嵌入自治系统号的前缀，这将极大程度的减少全局路由表的大小，同时也会减少UPDATE包的数目以及路由震荡的频率和收敛时间，尽可能解决IPv6 网络带来的可扩展路由问题。
 
   本文主要进行了以下工作；
 
   \begin{enumerate}
-  \item 提出了一个新型的基于无类AS的IPv6编址方案。同时为了实现IPv6网络域间路由的扩展性，设计了基于自治系统号的域间路由机制A-BGP(ASN based BGP)。
-  \item 将当前网络中的RIB表转换成FIB，与A-BGP得到的FIB表进行对比，评估CABA和A-BGP下FIB 表的压缩情况，结果显示A-BGP下的FIB 表项是现网络中FIB表的10\%。
-  \item 熟悉SIMBGP仿真系统，加载CAIDA上全网的拓扑结构，任选多个自治系统，对比其向外广播嵌入自治系统号的IPv6前缀和广播现在网络中广播出去的所有IPv4 的update包数和收敛时间，结果显示当前网络自治系统号广播出去的prefix越多，采用新型A-BGP机制update 数目减少幅度越大。
-  \item 通过Docker软件运行多台装有Quagga软件路由器的虚拟机器，部署小型拓扑结构，在该结构上实现A-BGP机制，通过查看生成的BGP 路由表表项数目，评估路由的可扩展程度。
+  \item 通过仿真和测试评价，在新型的无类AS的IPv6编址方案下基于自治系统号的域间路由机制A-BGP(ASN based BGP)，对路由可扩展性的影响。
+  \item 通过评估基于互联网路由表的FIB表压缩情况验证A-BGP对路由可扩展性的作用。结果显示A-BGP下的FIB表项是现网络中FIB表的10\%。
+  \item 通过SIMBGP仿真在全网拓扑结构下宣告UPDATE的数目验证A-BGP对路由可扩展性的作用。分析SIMBGP中向外广播嵌入自治系统号的IPv6 前缀和广播现在网络中已宣告的IPv4的update包数，结果显示当前网络自治系统广播出去的prefix 越多，采用新型A-BGP机制发出的update数目越少。
+  \item 通过测试小型拓扑结构下BGP路由表表项的数目验证A-BGP对路由可扩展性的作用。其中使用Docker软件运行多台Quagga软件路由器，部署自治系统均为Tier1层级的小型拓扑，向外宣告路由，结果显示其全局BGP路由表项从现有的9000多条减少到17条。
   \end{enumerate}
 \end{cabstract}
 
-\ckeywords{CABA, A-BGP, 可扩展路由}
+\ckeywords{自治系统, 域间路由, 可扩展路由}
 
 \begin{eabstract}
 With Internet improving and expanding and the number of network terminal equipments increasing, IPv4 address is exhausted. The technical from IPv4 to IPv6 is mature and there are many advantages in IPv6, so IPv6 network will develop rapidly in the future, which may result in some problems, including IPv6 network routing scalability, convergence and security issues and so on.
 
-In this paper, we propose a new IPv6 addressing scheme based AS, called CABA (Classless AS Based Addressing), in order to solve the IPv6 network routing scalability. This scheme is compatible with existing addressing scheme, so you can achieve it on the part of the network. In the new scheme, the autonomous system number embedded in the IPv6 address, then the autonomous system only needs to broadcast one prefix, which embedded the autonomous system number. This could not only greatly reduce the size of the global routing table, but also reduce the number of BGP update packets and routing flapping frequency and convergence time.
+In this thesis, we do some simulations and tests to verify the IPv6 network routing scalability under the new IPv6 addressing scheme based AS, called CABA (Classless AS Based Addressing) and the new inter-domain routing mechanism called A-BGP (ASN based BGP). This scheme is compatible with existing addressing scheme, and the autonomous system only needs to broadcast one prefix, which embedded the autonomous system number. This could not only greatly reduce the size of the global routing table, but also reduce the number of BGP update packets and routing flapping frequency and convergence time.
 
-This paper mainly for the following work;
+This thesis mainly for the following work;
 
 
 \begin{enumerate}
-\item Propose a new IPv6 addressing scheme called CABA and design a new inter-domain routing mechanism called A-BGP.
-\item Compare the number of current FIB table and the number of new FIB table based CABA and A-BGP. The result shows the new FIB table is 10\% of the current.
-\item Conduct simulations by SIMBGP on the CABA and A-BGP. The result shows that autonomous system of announcing more prefixs can reduce more BGP update packets when it uses the CABA and A-BGP.
-\item Use Docker to realize virtual software router, check the number of BGP routing table in the topology of Tier 1.
+\item Explain the new IPv6 addressing scheme called CABA and the new inter-domain routing mechanism called A-BGP.
+\item Compare the number of current FIB table and the number of new FIB table based CABA and A-BGP to verify the IPv6 network routing scalability. The result shows the new FIB table is 10\% of the current.
+\item Conduct simulations by SIMBGP on the CABA and A-BGP to verify IPv6 network routing scalability. The result shows that autonomous system of announcing more prefixs can reduce more UPDATE packets under new mechanism.
+\item Realize a virtual network environment based the CABA and A-BGP to verify the IPv6 network routing scalability. Use Docker to realize virtual software router, check the number of BGP routing table in the topology of Tier 1.The result shows BGP routing tables reduce from about 9000 to 17 in the new mechanism A-BGP.
 \end{enumerate}
 
 \end{eabstract}
 
-\ekeywords{CABA, A-BGP, Scalable Routing}
+\ekeywords{Autonomous System, Inter-domain, Scalable Routing}

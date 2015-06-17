@@ -3,9 +3,9 @@
 %%% mode: latex
 %%% TeX-master: t
 %%% End:
-\secretlevel{绝密} \secretyear{2100}
+\secretlevel{公开} \secretyear{2100}
 
-\ctitle{基于AS编址的互联网可扩展路由机制的性能评价}
+\ctitle{基于AS编址的互联网可扩展路由机制的仿真评价与测试}
 % 根据自己的情况选，不用这样复杂
 \makeatletter
 \ifthu@bachelor\relax\else
@@ -23,7 +23,7 @@
 \cdepartment[计算机]{计算机科学与技术系}
 \cmajor{计算机科学与技术}
 \cauthor{王庆}
-\csupervisor{王之梁副教授}
+\csupervisor{王之梁副研究员}
 % 如果没有副指导老师或者联合指导老师，把下面两行相应的删除即可。
 %\cassosupervisor{施新刚副教授}
 % \ccosupervisor{某某某教授}
@@ -61,51 +61,37 @@
 
 % 定义中英文摘要和关键字
 \begin{cabstract}
-  随着互联网的不断完善和扩展，以及网络设备和终端设备数量的不断增加，对IP地址的需求越来越大，以及现今IPv4地址处于枯竭的状态，从IPv4过渡到IPv6的技术逐渐成熟，IPv6地址本身的诸多优势，未来IPv6网络将会迅速发展，由此带来的IPv6网络路由的可扩展性、收敛性和安全性问题值得研究。
-  IPv6网络地址前缀的平均长度和最大长度都远超/24,未来IPv6核心路由表的规模将会迅速扩大，最终可能达到无法处理的程度。本文为了解决IPv6网络带来的可扩展路由问题，提出了基于无类AS编址的CABA(Classless AS Based Addressing)方案。
+  互联网的不断完善和扩展，网络设备和终端设备数量的不断增加，IPv4地址处于枯竭的状态，从IPv4过渡到IPv6的技术逐渐成熟，IPv6 地址本身的诸多优势，都预示未来IPv6网络将会迅速发展，由此带来的IPv6网络路由的可扩展性、收敛性和安全性问题值得研究。
 
-  当前有不少关于租户带宽保障的研究，但现有的模型均没有解决用户需求动态变化带来的种种问题，大多数
-  研究或避开这一问题或只是简单处理，而用户的带宽保障需求在实际应用中确实会产生变化。所以，需要一种新的带宽保障解决方案
-  既能方便描述用户的需求，同时解决现在其他方案不能解决的用户需求变化的问题。
+  本文通过对基于无类AS编址的CABA(Classless AS Based Addressing)方案，独立于现有网络的IPv6地址分配方案，同时能够兼容现有的IPv6 方案，可以实现增量部署。新型的CABA 方案，将自治系统号嵌入到IPv6的地址中，在BGP路由的过程中，一个自治系统只需要向外广播一条嵌入自治系统号的前缀，这将极大程度的减少全局路由表的大小，同时也会减少BGP 中update 包的数目以及路由震荡的频率和收敛时间，尽可能解决IPv6网络带来的可扩展路由问题。
 
-  本文章主要进行了如下工作；
+  本文主要进行了以下工作；
 
   \begin{enumerate}
-  \item 提出了一个新的租户带宽保障模型，能够便于描述租户复杂的带宽保障需求，同时本身将带宽资源和计算资源解耦的特点使得
-  实现这一模型的租户带宽保障系统能够有效的处理租户需求的动态变化。设计实现了应用此模型进行租户虚拟机部署的算法。
-  \item 设计实现了一个基于云的测试流量生成系统，该系统具备高可扩展、高并发、准确、易于使用的特点。在实际的OpenStack云平台上
-  部署了该系统，并验证了系统的性能和可扩展性。该系统作为一个典型的IaaS租户应用，可以获益于上面提出的租户带宽保障方案，
-  同时验证租户带宽保障方案的能力。
-  \item 对设计实现的算法进行了功能和性能测试，结果显示本文提出的模型可以使租户灵活地权衡取舍几种资源，从而达到比一般模型
-  更好的性能。
+  \item 通过仿真和测试评价，在新型的无类AS的IPv6编址方案下基于自治系统号的域间路由机制A-BGP(ASN based BGP)，对路由可扩展性的影响。
+  \item 通过评估基于互联网路由表的FIB表压缩情况验证A-BGP对路由可扩展性的作用。结果显示A-BGP下的FIB表项是现网络中FIB表的10\%。
+  \item 通过SIMBGP仿真在全网拓扑结构下宣告UPDATE的数目验证A-BGP对路由可扩展性的作用。分析SIMBGP中向外广播嵌入自治系统号的IPv6 前缀和广播现在网络中已宣告的IPv4的update包数，结果显示当前网络自治系统广播出去的prefix 越多，采用新型A-BGP机制发布的update数目越少。
+  \item 通过测试小型拓扑结构下BGP路由表表项的数目验证A-BGP对路由可扩展性的作用。其中使用Docker软件运行多台Quagga软件路由器，小型拓扑中自治系统均为Tier1层级，向外宣告路由，结果显示全局BGP路由表项从现有的9000多条减少到17条。
   \end{enumerate}
 \end{cabstract}
 
-\ckeywords{云, 数据中心网络, 多租户，带宽保障}
+\ckeywords{自治系统, 域间路由, 可扩展路由}
 
 \begin{eabstract}
-Infrastructure as a Service(IaaS) is an important type of service of cloud data centers.
-Taking advantage of the virtualization technology,
-tenants can save the cost of daily server maintaining and get clusters with more scalability and
-flexibility. Cloud providers can maximize the utility of computation and network resources of data
-centers through multiplexing of DCN. These benefits make contributes to the increasing popularity of IaaS.
-However, the more we use, the more requirements arise. The best effort tenant networks lack the guarantee of performance which
-tenants need. To protect the performance of tenant network, more research about the tenant bandwidth guarantee problem is needed.
+With Internet improving and expanding and the number of network terminal equipments increasing, IPv4 address is exhausted. The technical from IPv4 to IPv6 is mature and there are many advantages in IPv6, so IPv6 network will develop rapidly in the future, which may result in some problems, including IPv6 network routing scalability, convergence and security issues and so on.
 
-Prior works and models can't handle the issue raised by tenant requirement extending. However, the demand of
-tenant will change commonly in real tenant application scenarios. A new approach is needed to resolve the
-issue of tenant requirement extending.
+In this paper, we propose a new IPv6 addressing scheme based AS, called CABA (Classless AS Based Addressing), in order to solve the IPv6 network routing scalability. This scheme is compatible with existing addressing scheme, so you can achieve it on the part of the network. In the new scheme, the autonomous system number embedded in the IPv6 address, then the autonomous system only needs to broadcast one prefix, which embedded the autonomous system number. This could not only greatly reduce the size of the global routing table, but also reduce the number of BGP update packets and routing flapping frequency and convergence time.
 
-The main work of this thesis include:
+This paper mainly for the following work;
+
+
 \begin{enumerate}
-\item Propose a new model of tenant bandwidth guarantee which called Elastic Bandwidth Guarantee model
-to resolve the problem of tenant requirement extending by decouple the computation and network resources of tenant
-demand. Design a algorithm of VM allocation of this model.
-\item Implement a cloud-based test traffic generation system which is scalable, high-performance,
-accurate and easy-to-use.Deploy the system on OpenStack cloud and evaluate the performance of the system.
-\item Conduct simulations on the algorithm of EBG model. The result shows that the EBG model is more flexible
-to use the resource of cloud.
+\item Propose a new IPv6 addressing scheme called CABA and design a new inter-domain routing mechanism called A-BGP.
+\item Compare the number of current FIB table and the number of new FIB table based CABA and A-BGP. The result shows the new FIB table is 10\% of the current.
+\item Conduct simulations by SIMBGP on the CABA and A-BGP. The result shows that autonomous system of announcing more prefixs can reduce more BGP update packets when it uses the CABA and A-BGP.
+\item Use Docker to realize virtual software router, check the number of BGP routing table in the topology of Tier 1.
 \end{enumerate}
+
 \end{eabstract}
 
-\ekeywords{cloud, DCN, multi-tenancy, bandwidth guarantee}
+\ekeywords{CABA, A-BGP, Scalable Routing}
